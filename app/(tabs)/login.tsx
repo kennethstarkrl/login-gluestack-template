@@ -71,7 +71,7 @@ export default function HomeScreen() {
 
 
   return (
-    <ScrollView style={styles.screenContainer}>
+    <ScrollView contentContainerStyle={styles.screenContainer}>
       <View>
         <Card size="md" variant="elevated" className="m-3">
             <VStack>
@@ -115,12 +115,10 @@ export default function HomeScreen() {
                     isRequired={false}
                 >
                     <FormControlLabel style={{justifyContent:'space-between'}}>
-                    <FormControlLabelText>Password</FormControlLabelText>
-                    <FormControlLabelText>
+                        <FormControlLabelText>Password</FormControlLabelText>
                         <Link href="/forgot-password">
                             <LinkText>Forgot your password?</LinkText>
                         </Link>
-                    </FormControlLabelText>
                     </FormControlLabel>
                     <Input className="my-1" size="md">
                     <InputField
@@ -155,19 +153,25 @@ export default function HomeScreen() {
                         <ButtonText>Reset</ButtonText>
                     </Button> */}
                     <Button
+                        style={styles.loginButtons}
                         className="w-fit self-end mt-4"
                         size="sm"
-                        variant="outline"
+                        variant="solid"
                         onPress={handleSubmit}
                     >
-                        <MaterialIcons name="login" size={20} style={{color:'white', marginRight:5}} />
+                        <MaterialIcons name="login" size={20} style={{marginRight:5}} />
                         <ButtonText>Login with Email Address</ButtonText>
                     </Button>
                 </HStack>
-                <Text size="sm"> </Text>
-                <Divider className="my-0.5" />
-                <HStack space='md' style={{flexWrap:'wrap',justifyContent:'center'}}>
-                <Button
+                <HStack className="mt-3 items-center justify-center">
+                    <Divider className="w-[100px]" />
+                    <Text size="sm" style={{marginLeft:20,marginRight:20}}>OR</Text>
+                    <Divider className="w-[100px]" />
+                </HStack>
+
+                <View style={{flexWrap:'wrap',justifyContent:'center'}}>
+                    <Button
+                        style={styles.loginButtons}
                         className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
@@ -175,8 +179,9 @@ export default function HomeScreen() {
                     >
                         <AntDesign name="google" size={20} style={{color:'white', marginRight:5}} />
                         <ButtonText>Login with Google</ButtonText>
-                </Button>
-                <Button
+                    </Button>
+                    <Button
+                        style={styles.loginButtons}
                         className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
@@ -184,8 +189,9 @@ export default function HomeScreen() {
                     >
                         <Entypo name="facebook" size={20} style={{color:'white', marginRight:5}} />
                         <ButtonText>Login with Facebook</ButtonText>
-                </Button>
-                <Button
+                    </Button>
+                    <Button
+                        style={styles.loginButtons}
                         className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
@@ -193,10 +199,8 @@ export default function HomeScreen() {
                     >
                         <FontAwesome6 name="square-x-twitter" size={20} style={{color:'white', marginRight:5}} />
                         <ButtonText>Login with X</ButtonText>
-                </Button>
-
-                </HStack>
-                <Text size="sm"> </Text>
+                    </Button>
+                </View>
             </VStack>
         </Card>
       </View>
@@ -206,7 +210,9 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   screenContainer:{
-
+    alignItems: 'center',
+    justifyContent: 'center',
+    height:'100%'
   },
   titleContainer: {
     flexDirection: 'row',
@@ -224,4 +230,7 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  loginButtons:{
+    minWidth:'100%'
+  }
 });
