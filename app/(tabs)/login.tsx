@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
                 
-    import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 
@@ -13,15 +13,15 @@ import {
     FormControlError,
     FormControlErrorIcon,
     FormControlErrorText,
-    FormControlHelper,
     FormControlLabel,
     FormControlLabelText
 } from '@/components/ui/form-control';
 import { HStack } from '@/components/ui/hstack';
 import { AlertCircleIcon } from '@/components/ui/icon';
-import { Input, InputField } from '@/components/ui/input';
+import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { VStack } from '@/components/ui/vstack';
 
+import { EyeIcon, EyeOffIcon } from '@/components/ui/icon';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -38,16 +38,24 @@ import { Divider } from '@/components/ui/divider';
 
 import { Link, LinkText } from '@/components/ui/link';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
+import { useAuth } from '@/hooks/use-auth';
   
+import { useRouter } from 'expo-router';
   
 export default function HomeScreen() {
+    const router = useRouter();
+    const { login, isAuthenticated, logout } = useAuth();
     const [isInvalid, setIsInvalid] = useState(false);
     const [emailValue, setEmailValue] = useState('');
     const [isEmailInvalid, setIsEmailInvalid] = useState(false);
 
     const [passwordValue, setPasswordValue] = useState('');
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     const [rememberPassword,setRememberPassword] = useState(false);
+    
 
     const handleSubmit = () => {
         if(emailValue.length < 3) {
@@ -61,6 +69,11 @@ export default function HomeScreen() {
         } else {
             setIsPasswordInvalid(false);
         }
+
+        if(emailValue === 'demo@na.com' && passwordValue === 'password'){
+            login({email:emailValue,password:passwordValue,token:'demo-token-123'});
+            router.replace('/explore');
+        }
     };
     const handleReset = () => {
         setEmailValue('');
@@ -68,6 +81,9 @@ export default function HomeScreen() {
         setIsEmailInvalid(false);
         setIsPasswordInvalid(false);
     }
+    const handleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
 
   return (
@@ -91,15 +107,13 @@ export default function HomeScreen() {
                     <FormControlLabelText>Email Address</FormControlLabelText>
                     </FormControlLabel>
                     <Input className="my-1" size="md">
-                    <InputField
-                        type='text'
-                        placeholder="na@example.com"
-                        value={emailValue}
-                        onChangeText={(text) => {setEmailValue(text);setIsEmailInvalid(false)}}
-                    />
+                        <InputField
+                            type='text'
+                            placeholder="na@example.com"
+                            value={emailValue}
+                            onChangeText={(text) => {setEmailValue(text);setIsEmailInvalid(false)}}
+                        />
                     </Input>
-                    <FormControlHelper>
-                    </FormControlHelper>
                     <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
                     <FormControlErrorText className="text-red-500">
@@ -121,12 +135,15 @@ export default function HomeScreen() {
                         </Link>
                     </FormControlLabel>
                     <Input className="my-1" size="md">
-                    <InputField
-                        type="password"
-                        placeholder="password"
-                        value={passwordValue}
-                        onChangeText={(text) => {setPasswordValue(text);setIsPasswordInvalid(false)}}
-                    />
+                        <InputField
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="password"
+                            value={passwordValue}
+                            onChangeText={(text) => {setPasswordValue(text);setIsPasswordInvalid(false)}}
+                        />
+                        <InputSlot className="pr-3" onPress={handleShowPassword}>
+                            <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                        </InputSlot>
                     </Input>
                     <FormControlError>
                     <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
@@ -144,14 +161,6 @@ export default function HomeScreen() {
                     </HStack>
                 </FormControl>
                 <HStack space='md' style={{flexWrap:'wrap',justifyContent:'center'}}>
-                    {/* <Button
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="outline"
-                        onPress={handleReset}
-                    >
-                        <ButtonText>Reset</ButtonText>
-                    </Button> */}
                     <Button
                         style={styles.loginButtons}
                         className="w-fit self-end mt-4"

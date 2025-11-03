@@ -8,8 +8,11 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
+import { useAuth } from '@/hooks/use-auth';
+
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();  
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <Tabs
@@ -39,13 +42,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="account-plus" color={color} />,
         }}
       />
+      <Tabs.Protected guard={true}>
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+          name="explore"
+          options={{
+            title: 'Explore',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          }}
+        />     
+      </Tabs.Protected>
+      
     </Tabs>
   );
 }
