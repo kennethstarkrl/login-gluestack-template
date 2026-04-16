@@ -1,14 +1,12 @@
-import { Tabs } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
+import { AvatarMenuButton } from '@/components/navigation/avatar-menu-button';
+import { ResponsiveDrawerMenu } from '@/components/navigation/responsive-drawer-menu';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
-import { Button, ButtonText } from '@/components/ui/button';
-import { HStack } from '@/components/ui/hstack';
 
 import { useAuth } from '@/hooks/use-auth';
 
@@ -17,48 +15,83 @@ import { useRouter } from 'expo-router';
 export default function AuthedLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { width } = useWindowDimensions();
+  const { logout } = useAuth();
+  const isDesktop = Platform.OS === 'web' && width >= 1024;
+  const palette = colorScheme === 'dark' ? Colors.dark : Colors.light;
 
   const handleLogout = () => {
     logout();
     router.replace('/');
   };
+  const handleOpenSettings = () => {
+    router.push('/(authed)/settings');
+  };
+  const handleOpenProfile = () => {
+    router.push('/(authed)/profile');
+  };
 
   return (
-    <Tabs
+    <Drawer
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: true,
-        tabBarButton: HapticTab,
-        headerRight: () => {
-            return (
-                <HStack space='md' style={{marginRight:10}}>
-                    <Button
-                        style={styles.buttons}
-                        className="w-fit"
-                        size="sm"
-                        variant="outline"
-                        onPress={handleLogout}
-                    >
-                        <ButtonText>Logout</ButtonText>
-                    </Button>
-                </HStack>
-            )
-        },
-      }}>
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: 'Explore',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-          }}
-        />      
-    </Tabs>
+        headerShown: !isDesktop,
+        drawerType: isDesktop ? 'permanent' : 'front',
+        drawerStyle: { width: 320, backgroundColor: palette.background },
+        sceneStyle: isDesktop ? { marginLeft: 0 } : undefined,
+        drawerActiveTintColor: palette.tint,
+        headerRight: () =>
+          !isDesktop ? (
+            <AvatarMenuButton
+              onProfile={handleOpenProfile}
+              onSignOut={handleLogout}
+              onSettings={handleOpenSettings}
+              style={styles.headerAvatar}
+            />
+          ) : null,
+      }}
+      drawerContent={({ navigation }) => (
+        <ResponsiveDrawerMenu
+          isOpen
+          onClose={() => navigation.closeDrawer()}
+          title="APPNAME"
+          persistent={isDesktop}
+          renderMode="drawerContent"
+          showAvatarPlaceholder
+          onAvatarProfile={handleOpenProfile}
+          onAvatarSettings={handleOpenSettings}
+          onAvatarSignOut={handleLogout}
+          items={[
+            { label: 'Explore', href: '/(authed)/explore', icon: 'explore' },
+          ]}
+        />
+      )}>
+      <Drawer.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+          drawerIcon: ({ color }) => <IconSymbol size={20} name="paperplane.fill" color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="settings"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'Settings',
+        }}
+      />
+      <Drawer.Screen
+        name="profile"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'Profile',
+        }}
+      />
+    </Drawer>
   );
 };
 
 const styles = StyleSheet.create({
-    buttons: {
-        
+    headerAvatar: {
+      marginRight: 12,
     },
 });

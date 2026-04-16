@@ -13,7 +13,7 @@ module.exports = {
   safelist: [
     {
       pattern:
-        /(bg|border|text|stroke|fill)-(primary|secondary|tertiary|error|success|warning|info|typography|outline|background|indicator)-(0|50|100|200|300|400|500|600|700|800|900|950|white|gray|black|error|warning|muted|success|info|light|dark|primary)/,
+        /(bg|border|text|stroke|fill)-(primary|secondary|tertiary|error|success|warning|info|typography|outline|background|indicator|brand|surface|text|border)-(0|50|100|200|300|400|500|600|700|800|900|950|white|gray|black|error|warning|muted|success|info|light|dark|primary|default|elevated|subtle|strong)/,
     },
   ],
   theme: {
@@ -172,6 +172,24 @@ module.exports = {
           primary: 'rgb(var(--color-indicator-primary)/<alpha-value>)',
           info: 'rgb(var(--color-indicator-info)/<alpha-value>)',
           error: 'rgb(var(--color-indicator-error)/<alpha-value>)',
+        },
+        brand: {
+          500: 'rgb(var(--color-brand-500)/<alpha-value>)',
+          600: 'rgb(var(--color-brand-600)/<alpha-value>)',
+        },
+        surface: {
+          default: 'rgb(var(--color-surface-default)/<alpha-value>)',
+          elevated: 'rgb(var(--color-surface-elevated)/<alpha-value>)',
+          muted: 'rgb(var(--color-surface-muted)/<alpha-value>)',
+        },
+        text: {
+          default: 'rgb(var(--color-text-default)/<alpha-value>)',
+          muted: 'rgb(var(--color-text-muted)/<alpha-value>)',
+          subtle: 'rgb(var(--color-text-subtle)/<alpha-value>)',
+        },
+        border: {
+          default: 'rgb(var(--color-border-default)/<alpha-value>)',
+          strong: 'rgb(var(--color-border-strong)/<alpha-value>)',
         },
       },
       fontFamily: {

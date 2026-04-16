@@ -1,259 +1,171 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-
-                
-import { Card } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
-import { Text } from '@/components/ui/text';
-
-
-import { Button, ButtonText } from '@/components/ui/button';
-import {
-    FormControl,
-    FormControlError,
-    FormControlErrorIcon,
-    FormControlErrorText,
-    FormControlLabel,
-    FormControlLabelText
-} from '@/components/ui/form-control';
-import { HStack } from '@/components/ui/hstack';
-import { AlertCircleIcon } from '@/components/ui/icon';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { VStack } from '@/components/ui/vstack';
-
-import { EyeIcon, EyeOffIcon } from '@/components/ui/icon';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-
-import {
-    Checkbox,
-    CheckboxIcon,
-    CheckboxIndicator,
-    CheckboxLabel,
-} from '@/components/ui/checkbox';
-import { CheckIcon } from '@/components/ui/icon';
-
-import { Divider } from '@/components/ui/divider';
-
-import { Link, LinkText } from '@/components/ui/link';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
-import { useAuth } from '@/hooks/use-auth';
-  
 import { useRouter } from 'expo-router';
-  
-export default function HomeScreen() {
-    const router = useRouter();
-    const { login, isAuthenticated, logout } = useAuth();
-    const [isInvalid, setIsInvalid] = useState(false);
-    const [emailValue, setEmailValue] = useState('');
-    const [isEmailInvalid, setIsEmailInvalid] = useState(false);
+import { StyleSheet } from 'react-native';
 
-    const [passwordValue, setPasswordValue] = useState('');
-    const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+import { AuthScreenShell } from '@/components/app-ui/auth-screen-shell';
+import { FormActionStack } from '@/components/app-ui/form-action-stack';
+import { OrDivider } from '@/components/app-ui/or-divider';
+import {
+  Checkbox,
+  CheckboxIcon,
+  CheckboxIndicator,
+  CheckboxLabel,
+} from '@/components/ui/checkbox';
+import { Button, ButtonText } from '@/components/ui/button';
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+} from '@/components/ui/form-control';
+import { AlertCircleIcon, CheckIcon, EyeIcon, EyeOffIcon } from '@/components/ui/icon';
+import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
+import { Link, LinkText } from '@/components/ui/link';
+import { VStack } from '@/components/ui/vstack';
+import { useAuth } from '@/hooks/use-auth';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
-    const [rememberPassword,setRememberPassword] = useState(false);
-    
+export default function LoginScreen() {
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const palette = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const { login } = useAuth();
+  const isTestEnvironment = process.env.EXPO_PUBLIC_APP_ENV === 'test';
+  const [emailValue, setEmailValue] = useState('');
+  const [isEmailInvalid, setIsEmailInvalid] = useState(false);
+  const [passwordValue, setPasswordValue] = useState('');
+  const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberPassword, setRememberPassword] = useState(false);
 
-    const handleSubmit = () => {
-        if(emailValue.length < 3) {
-            setIsEmailInvalid(true);
-        } else {
-            setIsEmailInvalid(false);
-        }
+  const handleSubmit = () => {
+    const isEmailValid = emailValue.includes('@') && emailValue.length >= 3;
+    const isPasswordValid = passwordValue.length >= 6;
+    setIsEmailInvalid(!isEmailValid);
+    setIsPasswordInvalid(!isPasswordValid);
 
-        if (passwordValue.length < 6) {
-            setIsPasswordInvalid(true);
-        } else {
-            setIsPasswordInvalid(false);
-        }
-
-        if(emailValue === 'demo@na.com' && passwordValue === 'password'){
-            login({email:emailValue,password:passwordValue,token:'demo-token-123'});
-            router.replace('/explore');
-        }
-    };
-    const handleReset = () => {
-        setEmailValue('');
-        setPasswordValue('');
-        setIsEmailInvalid(false);
-        setIsPasswordInvalid(false);
+    if (isEmailValid && isPasswordValid && emailValue === 'demo@na.com' && passwordValue === 'password') {
+      login({ email: emailValue, password: passwordValue, token: 'demo-token-123' });
+      router.replace('/explore');
     }
-    const handleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
+  };
 
+  const handleTestLogin = () => {
+    login({ email: 'test-user@app.local', token: 'test-token-123' });
+    router.replace('/explore');
+  };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screenContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={styles.scrollContent}>
-      <View style={styles.formWrapper}>
-        <Card size="md" variant="elevated" className="m-3">
-            <VStack>
-            <Heading size="md" className="mb-1">
-                Login to your account
-            </Heading>
-            <Text size="sm">Enter your email below to login to your account</Text>
-            <Text size="sm"> </Text>
-                <FormControl
-                    isInvalid={isEmailInvalid}
-                    size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
-                >
-                    <FormControlLabel>
-                    <FormControlLabelText>Email Address</FormControlLabelText>
-                    </FormControlLabel>
-                    <Input className="my-1" size="md">
-                        <InputField
-                            type='text'
-                            placeholder="na@example.com"
-                            value={emailValue}
-                            onChangeText={(text) => {setEmailValue(text);setIsEmailInvalid(false)}}
-                        />
-                    </Input>
-                    <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
-                    <FormControlErrorText className="text-red-500">
-                        Username is invalid.
-                    </FormControlErrorText>
-                    </FormControlError>
-                </FormControl>
-                <FormControl
-                    isInvalid={isPasswordInvalid}
-                    size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
-                >
-                    <FormControlLabel style={{justifyContent:'space-between'}}>
-                        <FormControlLabelText>Password</FormControlLabelText>
-                        <Link href="/forgot-password">
-                            <LinkText>Forgot your password?</LinkText>
-                        </Link>
-                    </FormControlLabel>
-                    <Input className="my-1" size="md">
-                        <InputField
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="password"
-                            value={passwordValue}
-                            onChangeText={(text) => {setPasswordValue(text);setIsPasswordInvalid(false)}}
-                        />
-                        <InputSlot className="pr-3" onPress={handleShowPassword}>
-                            <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
-                        </InputSlot>
-                    </Input>
-                    <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
-                    <FormControlErrorText className="text-red-500">
-                        At least 6 characters are required.
-                    </FormControlErrorText>
-                    </FormControlError>
-                    <HStack space="md" style={{marginTop:5,flexWrap:'wrap',justifyContent:'space-between'}}>
-                        <Checkbox value={'remember'} isDisabled={false} isInvalid={false} size="md" isChecked={rememberPassword} onChange={(e)=>setRememberPassword(e)}>
-                            <CheckboxIndicator>
-                                <CheckboxIcon as={CheckIcon} />
-                            </CheckboxIndicator>
-                            <CheckboxLabel>Remember me</CheckboxLabel>
-                        </Checkbox>
-                    </HStack>
-                </FormControl>
-                <HStack space='md' style={{flexWrap:'wrap',justifyContent:'center'}}>
-                    <Button
-                        style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="solid"
-                        onPress={handleSubmit}
-                    >
-                        <MaterialIcons name="login" size={20} style={{marginRight:5}} />
-                        <ButtonText>Login with Email Address</ButtonText>
-                    </Button>
-                </HStack>
-                <HStack className="mt-3 items-center justify-center">
-                    <Divider className="w-[100px]" />
-                    <Text size="sm" style={{marginLeft:20,marginRight:20}}>OR</Text>
-                    <Divider className="w-[100px]" />
-                </HStack>
+    <AuthScreenShell title="Welcome back" subtitle="Sign in to continue managing your account and workspace.">
+      <VStack space="md">
+        <FormControl isInvalid={isEmailInvalid} size="md">
+          <FormControlLabel>
+            <FormControlLabelText>Email Address</FormControlLabelText>
+          </FormControlLabel>
+          <Input size="md">
+            <InputField
+              type="text"
+              placeholder="name@company.com"
+              value={emailValue}
+              onChangeText={(text) => {
+                setEmailValue(text);
+                setIsEmailInvalid(false);
+              }}
+            />
+          </Input>
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>Please enter a valid email address.</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
 
-                <View style={{flexWrap:'wrap',justifyContent:'center'}}>
-                    <Button
-                        style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="outline"
-                        onPress={()=>console.log('Login with Google')}
-                    >
-                        <AntDesign name="google" size={20} style={{color:'white', marginRight:5}} />
-                        <ButtonText>Login with Google</ButtonText>
-                    </Button>
-                    <Button
-                        style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="outline"
-                        onPress={()=>console.log('Login with Facebook')}
-                    >
-                        <Entypo name="facebook" size={20} style={{color:'white', marginRight:5}} />
-                        <ButtonText>Login with Facebook</ButtonText>
-                    </Button>
-                    <Button
-                        style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="outline"
-                        onPress={()=>console.log('Login with Github')}
-                    >
-                        <FontAwesome6 name="square-x-twitter" size={20} style={{color:'white', marginRight:5}} />
-                        <ButtonText>Login with X</ButtonText>
-                    </Button>
-                </View>
-            </VStack>
-        </Card>
-      </View>
-    </ScrollView>
-    </KeyboardAvoidingView>
+        <FormControl isInvalid={isPasswordInvalid} size="md">
+          <FormControlLabel style={styles.passwordLabel}>
+            <FormControlLabelText>Password</FormControlLabelText>
+            <Link href="/forgot-password" style={styles.forgotPasswordLink}>
+              <LinkText>Forgot password?</LinkText>
+            </Link>
+          </FormControlLabel>
+          <Input size="md">
+            <InputField
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Your password"
+              value={passwordValue}
+              onChangeText={(text) => {
+                setPasswordValue(text);
+                setIsPasswordInvalid(false);
+              }}
+            />
+            <InputSlot className="pr-3" onPress={() => setShowPassword((prev) => !prev)}>
+              <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+            </InputSlot>
+          </Input>
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <Checkbox value="remember" size="md" isChecked={rememberPassword} onChange={setRememberPassword}>
+          <CheckboxIndicator>
+            <CheckboxIcon as={CheckIcon} />
+          </CheckboxIndicator>
+          <CheckboxLabel>Remember this device</CheckboxLabel>
+        </Checkbox>
+      </VStack>
+
+      <FormActionStack>
+        <Button size="sm" onPress={handleSubmit} style={styles.fullButton}>
+          <MaterialIcons name="login" size={18} color={Colors.light.text} style={styles.buttonIcon} />
+          <ButtonText>Sign in</ButtonText>
+        </Button>
+        {isTestEnvironment ? (
+          <Button size="sm" variant="outline" style={styles.fullButton} onPress={handleTestLogin}>
+            <ButtonText>Continue as test user</ButtonText>
+          </Button>
+        ) : null}
+      </FormActionStack>
+
+      <OrDivider />
+
+      <VStack space="sm">
+        <Button size="sm" variant="outline" style={styles.fullButton} onPress={() => console.log('Google login')}>
+          <AntDesign name="google" size={18} color={palette.text} style={styles.buttonIcon} />
+          <ButtonText>Continue with Google</ButtonText>
+        </Button>
+        <Button size="sm" variant="outline" style={styles.fullButton} onPress={() => console.log('Facebook login')}>
+          <Entypo name="facebook" size={18} color={palette.text} style={styles.buttonIcon} />
+          <ButtonText>Continue with Facebook</ButtonText>
+        </Button>
+        <Button size="sm" variant="outline" style={styles.fullButton} onPress={() => console.log('X login')}>
+          <FontAwesome6 name="x-twitter" size={16} color={palette.text} style={styles.buttonIcon} />
+          <ButtonText>Continue with X</ButtonText>
+        </Button>
+      </VStack>
+    </AuthScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  screenContainer:{
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-  },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 480,
-    alignSelf: 'center',
-  },
-  titleContainer: {
-    flexDirection: 'row',
+  passwordLabel: {
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    width: '100%',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  forgotPasswordLink: {
+    marginLeft: 'auto',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  fullButton: {
+    width: '100%',
   },
-  loginButtons:{
-    minWidth:'100%'
-  }
+  buttonIcon: {
+    marginRight: 6,
+  },
 });

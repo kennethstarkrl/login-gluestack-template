@@ -1,7 +1,8 @@
-import { Tabs } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import React from 'react';
+import { Platform, useWindowDimensions } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
+import { ResponsiveDrawerMenu } from '@/components/navigation/responsive-drawer-menu';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -9,34 +10,68 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 1024;
+  const palette = colorScheme === 'dark' ? Colors.dark : Colors.light;
 
   return (
-    <Tabs
+    <Drawer
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
+        headerShown: !isDesktop,
+        drawerType: isDesktop ? 'permanent' : 'front',
+        drawerStyle: { width: 320, backgroundColor: palette.background },
+        sceneStyle: isDesktop ? { marginLeft: 0 } : undefined,
+        drawerActiveTintColor: palette.tint,
+      }}
+      drawerContent={({ navigation }) => (
+        <ResponsiveDrawerMenu
+          isOpen
+          onClose={() => navigation.closeDrawer()}
+          title="APPNAME"
+          persistent={isDesktop}
+          renderMode="drawerContent"
+          items={[
+            { label: 'Home', href: '/', icon: 'home' },
+            { label: 'Login', href: '/login', icon: 'login' },
+            { label: 'Signup', href: '/signup', icon: 'person-add' },
+          ]}
+        />
+      )}>
+      <Drawer.Screen
         name="index"
         options={{
-          href: null,
+          drawerItemStyle: { display: 'none' },
+          title: 'Home',
         }}
       />
-      <Tabs.Screen
+      <Drawer.Screen
         name="login"
         options={{
           title: 'Login',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="login" color={color} />,
+          drawerIcon: ({ color }) => <MaterialIcons size={20} name="login" color={color} />,
         }}
       />
-      <Tabs.Screen
+      <Drawer.Screen
         name="signup"
         options={{
           title: 'Signup',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={28} name="account-plus" color={color} />,
+          drawerIcon: ({ color }) => <MaterialCommunityIcons size={20} name="account-plus" color={color} />,
         }}
       />
-    </Tabs>
+      <Drawer.Screen
+        name="forgot-password"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'Forgot Password',
+        }}
+      />
+      <Drawer.Screen
+        name="verify-email"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          title: 'Verify Email',
+        }}
+      />
+    </Drawer>
   );
 }

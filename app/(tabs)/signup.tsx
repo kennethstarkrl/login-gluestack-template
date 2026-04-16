@@ -1,51 +1,40 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-
-                
-    import { Card } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
-import { Text } from '@/components/ui/text';
-
-
-import { Button, ButtonText } from '@/components/ui/button';
-import {
-    FormControl,
-    FormControlError,
-    FormControlErrorIcon,
-    FormControlErrorText,
-    FormControlLabel,
-    FormControlLabelText
-} from '@/components/ui/form-control';
-import { HStack } from '@/components/ui/hstack';
-import { AlertCircleIcon } from '@/components/ui/icon';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { VStack } from '@/components/ui/vstack';
-
-import { EyeIcon, EyeOffIcon } from '@/components/ui/icon';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useRouter } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 
+import { AuthScreenShell } from '@/components/app-ui/auth-screen-shell';
+import { FormActionStack } from '@/components/app-ui/form-action-stack';
+import { OrDivider } from '@/components/app-ui/or-divider';
+import { Button, ButtonText } from '@/components/ui/button';
 import {
-    Checkbox,
-    CheckboxIcon,
-    CheckboxIndicator,
-    CheckboxLabel,
+  Checkbox,
+  CheckboxIcon,
+  CheckboxIndicator,
+  CheckboxLabel,
 } from '@/components/ui/checkbox';
-import { CheckIcon } from '@/components/ui/icon';
-
-import { Divider } from '@/components/ui/divider';
-
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+} from '@/components/ui/form-control';
+import { AlertCircleIcon, CheckIcon, EyeIcon, EyeOffIcon } from '@/components/ui/icon';
+import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { Link, LinkText } from '@/components/ui/link';
-
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useRouter } from 'expo-router';
-  
-  
+
 export default function SignupScreen() {
-    const colorScheme = useColorScheme();
     const router = useRouter();
+    const colorScheme = useColorScheme();
+    const palette = colorScheme === 'dark' ? Colors.dark : Colors.light;
 
     const [usernameValue, setUsernameValue] = useState('');
     const [isUsernameInvalid, setIsUsernameInvalid] = useState(false);
@@ -123,26 +112,13 @@ export default function SignupScreen() {
     };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screenContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={styles.scrollContent}>
-      <View style={styles.formWrapper}>
-        <Card size="md" variant="elevated" className="m-3">
-            <VStack>
-            <Heading size="md" className="mb-1">
-                Create a new account
-            </Heading>
-            <Text size="sm">Enter your username and email address below to create a new account</Text>
-            <Text size="sm"> </Text>
+    <AuthScreenShell
+      title="Create your account"
+      subtitle="Get started with a polished, secure experience in less than a minute.">
+      <VStack space="md">
             <FormControl
                     isInvalid={isUsernameInvalid}
                     size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
                 >
                     <FormControlLabel>
                         <FormControlLabelText>Username</FormControlLabelText>
@@ -165,9 +141,6 @@ export default function SignupScreen() {
                 <FormControl
                     isInvalid={isEmailInvalid}
                     size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
                 >
                     <FormControlLabel>
                     <FormControlLabelText>Email Address</FormControlLabelText>
@@ -190,9 +163,6 @@ export default function SignupScreen() {
                 <FormControl
                     isInvalid={isPasswordInvalid}
                     size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
                 >
                     <FormControlLabel style={{justifyContent:'space-between'}}>
                         <FormControlLabelText>Password</FormControlLabelText>
@@ -218,9 +188,6 @@ export default function SignupScreen() {
                 <FormControl
                     isInvalid={isConfirmPasswordInvalid}
                     size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
                 >
                     <FormControlLabel style={{justifyContent:'space-between'}}>
                         <FormControlLabelText>Confirm Password</FormControlLabelText>
@@ -242,114 +209,76 @@ export default function SignupScreen() {
                         Passwords do not match.
                     </FormControlErrorText>
                     </FormControlError>
-                    <HStack space="md" style={{marginTop:5,flexWrap:'wrap',justifyContent:'space-between'}}>
-                        <Checkbox value={'terms'} isDisabled={false} isInvalid={false} size="md" isChecked={termsAgreed} onChange={(e)=>{setTermsAgreed(e);setTermsAgreedInvalid(false)}}>
+                    <View style={styles.termsRow}>
+                        <Checkbox value={'terms'} isInvalid={false} size="md" isChecked={termsAgreed} onChange={(e)=>{setTermsAgreed(e);setTermsAgreedInvalid(false)}}>
                             <CheckboxIndicator>
                                 <CheckboxIcon as={CheckIcon} />
                             </CheckboxIndicator>
-                            <CheckboxLabel>I agree to the</CheckboxLabel>
-                            <Link href="/terms-of-service"><LinkText>Terms of Service</LinkText></Link>
-                            <CheckboxLabel>and</CheckboxLabel>
-                            <Link href="/privacy-policy"><LinkText>Privacy Policy</LinkText></Link>
+                            <CheckboxLabel>I agree to the terms and policy</CheckboxLabel>
                         </Checkbox>
-                    </HStack>
+                    </View>
+                    <Text size="sm" className="text-text-subtle">
+                      By creating an account, you agree to our{' '}
+                      <Link href="/"><LinkText>Terms of Service</LinkText></Link> and{' '}
+                      <Link href="/"><LinkText>Privacy Policy</LinkText></Link>.
+                    </Text>
                     {termsAgreedInvalid ? 
                     <FormControlError>
-                        <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
-                        <FormControlErrorText className="text-red-500">
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
                             You must agree to the terms of service and privacy policy.
                         </FormControlErrorText>
                     </FormControlError>
                     : null}
                 </FormControl>
-                <HStack space='md' style={{flexWrap:'wrap',justifyContent:'center'}}>
+            </VStack>
+            <FormActionStack>
+                <Button style={styles.loginButtons} size="sm" onPress={handleSubmit}>
+                    <ButtonText>Create account</ButtonText>
+                </Button>
+            </FormActionStack>
+            <OrDivider />
+            <VStack space="sm">
                     <Button
                         style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
-                        size="sm"
-                        variant="solid"
-                        onPress={handleSubmit}
-                    >
-                        <ButtonText>Submit</ButtonText>
-                    </Button>
-                </HStack>
-                <HStack className="mt-3 items-center justify-center">
-                    <Divider className="w-[100px]" />
-                    <Text size="sm" style={{marginLeft:20,marginRight:20}}>OR</Text>
-                    <Divider className="w-[100px]" />
-                </HStack>
-
-                <View style={{flexWrap:'wrap',justifyContent:'center'}}>
-                    <Button
-                        style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
                         onPress={()=>console.log('Signup with Google')}
                     >
-                        <AntDesign name="google" size={20} style={{color:Colors[colorScheme ?? 'light'].text, marginRight:5}} />
-                        <ButtonText>Signup with Google</ButtonText>
+                        <AntDesign name="google" size={18} color={palette.text} style={styles.socialIcon} />
+                        <ButtonText>Continue with Google</ButtonText>
                     </Button>
                     <Button
                         style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
                         onPress={()=>console.log('Signup with Facebook')}
                     >
-                        <Entypo name="facebook" size={20} style={{color:Colors[colorScheme ?? 'light'].text, marginRight:5}} />
-                        <ButtonText>Signup with Facebook</ButtonText>
+                        <Entypo name="facebook" size={18} color={palette.text} style={styles.socialIcon} />
+                        <ButtonText>Continue with Facebook</ButtonText>
                     </Button>
                     <Button
                         style={styles.loginButtons}
-                        className="w-fit self-end mt-4"
                         size="sm"
                         variant="outline"
                         onPress={()=>console.log('Signup with X')}
                     >
-                        <FontAwesome6 name="square-x-twitter" size={20} style={{color:Colors[colorScheme ?? 'light'].text, marginRight:5}} />
-                        <ButtonText>Signup with X</ButtonText>
+                        <FontAwesome6 name="x-twitter" size={16} color={palette.text} style={styles.socialIcon} />
+                        <ButtonText>Continue with X</ButtonText>
                     </Button>
-                </View>
             </VStack>
-        </Card>
-      </View>
-    </ScrollView>
-    </KeyboardAvoidingView>
+    </AuthScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  screenContainer:{
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-  },
-  formWrapper: {
-    width: '100%',
-    maxWidth: 480,
-    alignSelf: 'center',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
   loginButtons:{
     minWidth:'100%'
-  }
+  },
+  termsRow: {
+    marginTop: 6,
+  },
+  socialIcon: {
+    marginRight: 6,
+  },
 });

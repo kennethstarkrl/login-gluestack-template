@@ -8,7 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 
-import AuthContext, { AuthProvider } from '@/contexts/auth-context';
+import { AuthProvider } from '@/contexts/auth-context';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -16,24 +16,20 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const resolvedMode = colorScheme ?? 'system';
 
   return (
     <AuthProvider>
-      <AuthContext.Consumer>
-        {({isAuthenticated}) => {
-          return(
-          <GluestackUIProvider mode="dark">
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              <Stack.Screen name="(authed)" options={{ headerShown: false }} />
-            </Stack>
-            <StatusBar style="auto" />
-          </ThemeProvider>
-          </GluestackUIProvider>
-        )}}
-      </AuthContext.Consumer>
+      <GluestackUIProvider mode={resolvedMode}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            <Stack.Screen name="(authed)" options={{ headerShown: false }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </GluestackUIProvider>
     </AuthProvider>
   );
 }
