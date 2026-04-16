@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
                 
     import { Card } from '@/components/ui/card';
@@ -40,19 +40,18 @@ import { Link, LinkText } from '@/components/ui/link';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useRouter } from 'expo-router';
   
   
 export default function SignupScreen() {
     const colorScheme = useColorScheme();
+    const router = useRouter();
 
     const [usernameValue, setUsernameValue] = useState('');
     const [isUsernameInvalid, setIsUsernameInvalid] = useState(false);
 
     const [emailValue, setEmailValue] = useState('');
     const [isEmailInvalid, setIsEmailInvalid] = useState(false);
-    
-    const [confirmEmailValue, setConfirmEmailValue] = useState('');
-    const [isConfirmEmailInvalid, setIsConfirmEmailInvalid] = useState(false);
 
     const [passwordValue, setPasswordValue] = useState('');
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
@@ -66,6 +65,12 @@ export default function SignupScreen() {
     const [termsAgreedInvalid,setTermsAgreedInvalid] = useState(false);
 
     const handleSubmit = () => {
+        const isUsernameValid = usernameValue.length >= 3;
+        const isEmailValid = emailValue.length >= 3;
+        const isPasswordValid = passwordValue.length >= 6;
+        const isConfirmPasswordValid = passwordValue === confirmPasswordValue && confirmPasswordValue.length >= 6;
+        const hasAcceptedTerms = termsAgreed;
+
         if(usernameValue.length < 3) {
             setIsUsernameInvalid(true);
         } else {
@@ -76,12 +81,6 @@ export default function SignupScreen() {
             setIsEmailInvalid(true);
         } else {
             setIsEmailInvalid(false);
-        }
-
-        if(emailValue !== confirmEmailValue || confirmEmailValue.length < 3) {
-            setIsConfirmEmailInvalid(true);
-        } else {
-            setIsConfirmEmailInvalid(false);
         }
 
         if (passwordValue.length < 6) {
@@ -101,6 +100,19 @@ export default function SignupScreen() {
         } else {
             setTermsAgreedInvalid(false);
         }
+
+        if (
+            isUsernameValid &&
+            isEmailValid &&
+            isPasswordValid &&
+            isConfirmPasswordValid &&
+            hasAcceptedTerms
+        ) {
+            router.push({
+                pathname: '/verify-email',
+                params: { email: emailValue },
+            });
+        }
     };
 
     const handleShowPassword = () => {
@@ -111,8 +123,13 @@ export default function SignupScreen() {
     };
 
   return (
-    <ScrollView contentContainerStyle={styles.screenContainer}>
-      <View>
+    <KeyboardAvoidingView
+      style={styles.screenContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.scrollContent}>
+      <View style={styles.formWrapper}>
         <Card size="md" variant="elevated" className="m-3">
             <VStack>
             <Heading size="md" className="mb-1">
@@ -167,31 +184,6 @@ export default function SignupScreen() {
                     <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
                     <FormControlErrorText className="text-red-500">
                         Email Address is invalid.
-                    </FormControlErrorText>
-                    </FormControlError>
-                </FormControl>
-                <FormControl
-                    isInvalid={isConfirmEmailInvalid}
-                    size="md"
-                    isDisabled={false}
-                    isReadOnly={false}
-                    isRequired={false}
-                >
-                    <FormControlLabel>
-                    <FormControlLabelText>Confirm Email Address</FormControlLabelText>
-                    </FormControlLabel>
-                    <Input className="my-1" size="md">
-                    <InputField
-                        type='text'
-                        placeholder="na@example.com"
-                        value={confirmEmailValue}
-                        onChangeText={(text) => {setConfirmEmailValue(text);setIsConfirmEmailInvalid(false)}}
-                    />
-                    </Input>
-                    <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} className="text-red-500" />
-                    <FormControlErrorText className="text-red-500">
-                        Email Address doesn't match.
                     </FormControlErrorText>
                     </FormControlError>
                 </FormControl>
@@ -323,14 +315,23 @@ export default function SignupScreen() {
         </Card>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screenContainer:{
-    alignItems: 'center',
-    justifyContent: 'center',
-    height:'100%'
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+  },
+  formWrapper: {
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
   titleContainer: {
     flexDirection: 'row',

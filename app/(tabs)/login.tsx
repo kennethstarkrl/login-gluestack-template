@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
                 
 import { Card } from '@/components/ui/card';
@@ -87,8 +87,13 @@ export default function HomeScreen() {
 
 
   return (
-    <ScrollView contentContainerStyle={styles.screenContainer}>
-      <View>
+    <KeyboardAvoidingView
+      style={styles.screenContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.scrollContent}>
+      <View style={styles.formWrapper}>
         <Card size="md" variant="elevated" className="m-3">
             <VStack>
             <Heading size="md" className="mb-1">
@@ -214,14 +219,23 @@ export default function HomeScreen() {
         </Card>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screenContainer:{
-    alignItems: 'center',
-    justifyContent: 'center',
-    height:'100%'
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+  },
+  formWrapper: {
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
   titleContainer: {
     flexDirection: 'row',
